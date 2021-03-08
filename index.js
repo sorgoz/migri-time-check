@@ -29,7 +29,7 @@ const OFFICES = {
     },
     turku: {
         officeId: '074cc6f8-735b-4ea5-ad9a-9e517fef09bb',
-        minTime: '11',
+        minTime: '10',
         maxTime: '16'
     },
     tampere: {
@@ -44,7 +44,12 @@ const OFFICES = {
 
 // URL: https://migri.vihta.com/public/migri/api/scheduling/offices/25ee3bce-aec9-41a7-b920-74dc09112dd4/2020/w44?end_hours=24&start_hours=0
 
-const SERVICE_ID = '4f53e3ce-ad70-4a8b-ad87-5b505aa200c7';
+// const SERVICE_ID = '4f53e3ce-ad70-4a8b-ad87-5b505aa200c7'; // ??
+const SERVICE_ID = 'a87390ae-a870-44d4-80a7-ded974f4cb06'; // residence-permit - family (first and extended permit)
+const SESSION_ID = 'b87ac6c9-0a49-4305-8401-3c7017e72e50';
+
+const DATE_FORMAT = 'YYYY-MM-DD';
+const DATETIME_FORMAT = 'YYYY-MM-DD HH:MM';
 
 async function getOfficeTimes(officeId, year, week, minTime, maxTime) {
 
@@ -54,7 +59,7 @@ async function getOfficeTimes(officeId, year, week, minTime, maxTime) {
         'referer': 'https://migri.vihta.com/public/migri/',
         'Content-Type': 'application/json;charset=UTF-8',
         'Accept': 'application/json, text/plain, */*',
-        'vihta-session': 'aa2b1e5f-50a4-44d4-8e0d-da5de5a22c67',
+        'vihta-session': SESSION_ID,
         'sec-fetch-site': 'same-origin',
         'sec-fetch-mode': 'cors',
         'sec-fetch-dest': 'empty',
@@ -89,9 +94,9 @@ function printTime(officeName, year, week, slots) {
 
             let slot = slots[d][t];
             let numberOfQueues = slot.resources.length;
-            let slotsDate = chalk.green(moment(slot.startTimestamp).format('D MMM YYYY HH:mm'));
+            let slotsDate = chalk.green(moment(slot.startTimestamp).format(DATETIME_FORMAT));
 
-            console.log(`Migri ${officeName.toUpperCase()}, ${slotsDate}, windows available: ${numberOfQueues}`);
+            console.log(`Migri ${officeName.toUpperCase()}: ${slotsDate}, windows available: ${numberOfQueues}`);
         }
     }
 
@@ -133,7 +138,7 @@ async function run() {
             }
 
             if (found === 0) {
-                console.log(`Migri ${officeName.toUpperCase()}: ${NOSLOTS} ${startDate.format('D MMM YYYY')}" - ${endDate.format('D MMM YYYY')}`);
+                console.log(`Migri ${officeName.toUpperCase()}: ${NOSLOTS} ${startDate.format(DATE_FORMAT)} - ${endDate.format(DATE_FORMAT)}`);
             }
 
             // console.log('\n');
@@ -142,7 +147,7 @@ async function run() {
         {concurrency: 2}
     );
 
-    console.log(`\n\nLast check done at ${moment().format('HH:mm')} avoid doing new check till ${chalk.red(moment().add(15, 'minute').format('HH:mm'))}`);
+    console.log(`\nLast check done at ${moment().format('HH:mm')} avoid doing new check till ${chalk.red(moment().add(15, 'minute').format('HH:mm'))}`);
 
 }
 
